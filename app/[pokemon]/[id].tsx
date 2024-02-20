@@ -2,13 +2,16 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { getPokemonDetail } from '@/api/pokeapi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from '@tanstack/react-query';
+import { storage } from '@/api/mmkv';
 
 const Page = () => {
   const { id } = useLocalSearchParams<{ id: 'string' }>();
   const { setOptions } = useNavigation();
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(
+    storage.getString(`favorite-${id}`) === 'true'
+  );
+
   const pokemonQuery = useQuery({
     queryKey: ['pokemon', id],
     queryFn: () => getPokemonDetail(id!),
@@ -23,8 +26,6 @@ const Page = () => {
           pokemonQuery.data?.name.charAt(0).toUpperCase() +
           pokemonQuery.data?.name.slice(1), // Upper first
       });
-
-      setIsFavorite((await AsyncStorage.getItem(`favorite-${id}`)) === 'true');
     };
 
     load();
@@ -44,10 +45,7 @@ const Page = () => {
   }, [isFavorite]);
 
   const toggleFavorite = async () => {
-    await AsyncStorage.setItem(
-      `favorite-${id}`,
-      !isFavorite ? 'true' : 'false'
-    );
+    storage.set(`favorite-${id}`, isFavorite ? 'false' : 'true');
     setIsFavorite(!isFavorite);
   };
 
