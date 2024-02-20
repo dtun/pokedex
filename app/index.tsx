@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -6,26 +7,19 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useEffect, useState } from 'react';
-import { Pokemon, getPokemon } from '@/api/pokeapi';
+import { getPokemon } from '@/api/pokeapi';
 import { Link } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
 
 const Page = () => {
-  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
-
-  useEffect(() => {
-    const load = async () => {
-      const result = await getPokemon();
-
-      setPokemon(result);
-    };
-
-    load();
-  }, []);
+  const pokemonQuery = useQuery({ queryKey: ['pokemon'], queryFn: getPokemon });
 
   return (
     <ScrollView>
-      {pokemon.map((p) => (
+      {pokemonQuery.isLoading && (
+        <ActivityIndicator style={{ marginTop: 30 }} />
+      )}
+      {pokemonQuery.data?.map((p) => (
         <Link href={`/[pokemon]/${p.id}`} key={p.id} asChild>
           <TouchableWithoutFeedback>
             <View style={styles.item}>

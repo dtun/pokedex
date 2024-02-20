@@ -1,27 +1,32 @@
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { Pokemon, getPokemonDetail } from '@/api/pokeapi';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { getPokemonDetail } from '@/api/pokeapi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery } from '@tanstack/react-query';
 
 const Page = () => {
   const { id } = useLocalSearchParams<{ id: 'string' }>();
-  const [details, setDetails] = useState<Pokemon>();
   const { setOptions } = useNavigation();
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const pokemonQuery = useQuery({
+    queryKey: ['pokemon', id],
+    queryFn: () => getPokemonDetail(id!),
+  });
 
   useEffect(() => {
     const load = async () => {
-      const details = await getPokemonDetail(id!);
-
-      setDetails(details);
+      if (!pokemonQuery.data) return;
 
       setOptions({
-        title: details?.name.charAt(0).toUpperCase() + details?.name.slice(1), // Upper first
+        title:
+          pokemonQuery.data?.name.charAt(0).toUpperCase() +
+          pokemonQuery.data?.name.slice(1), // Upper first
       });
 
       setIsFavorite((await AsyncStorage.getItem(`favorite-${id}`)) === 'true');
     };
+
     load();
   }, [id]);
 
@@ -48,20 +53,23 @@ const Page = () => {
 
   return (
     <View style={{ padding: 10 }}>
-      {details && (
+      {pokemonQuery.isLoading && (
+        <ActivityIndicator style={{ marginTop: 30 }} />
+      )}
+      {pokemonQuery.data && (
         <>
           <View style={[styles.card, { alignItems: 'center' }]}>
             <Image
-              source={{ uri: details.sprites.front_default }}
+              source={{ uri: pokemonQuery.data.sprites.front_default }}
               style={styles.cardImage}
             />
             <Text style={styles.name}>
-              #{details.id} {details.name}
+              #{pokemonQuery.data.id} {pokemonQuery.data.name}
             </Text>
           </View>
           <View style={styles.card}>
             <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Stats:</Text>
-            {details.stats.map((s: any) => (
+            {pokemonQuery.data.stats.map((s: any) => (
               <Text key={s.stat.name}>
                 {s.stat.name}: {s.base_stat}
               </Text>
