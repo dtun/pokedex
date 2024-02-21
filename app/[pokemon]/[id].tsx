@@ -4,6 +4,11 @@ import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { getPokemonDetail } from '@/api/pokeapi';
 import { useQuery } from '@tanstack/react-query';
 import { storage } from '@/api/mmkv';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FlipInEasyX,
+} from 'react-native-reanimated';
 
 const Page = () => {
   const { id } = useLocalSearchParams<{ id: 'string' }>();
@@ -56,23 +61,29 @@ const Page = () => {
       )}
       {pokemonQuery.data && (
         <>
-          <View style={[styles.card, { alignItems: 'center' }]}>
+          <Animated.View
+            entering={FadeIn.delay(200)}
+            style={[styles.card, { alignItems: 'center' }]}
+          >
             <Image
               source={{ uri: pokemonQuery.data.sprites.front_default }}
               style={styles.cardImage}
             />
-            <Text style={styles.name}>
+            <Animated.Text
+              entering={FlipInEasyX.delay(300)}
+              style={styles.name}
+            >
               #{pokemonQuery.data.id} {pokemonQuery.data.name}
-            </Text>
-          </View>
-          <View style={styles.card}>
+            </Animated.Text>
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(500)} style={styles.card}>
             <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Stats:</Text>
             {pokemonQuery.data.stats.map((s: any) => (
               <Text key={s.stat.name}>
                 {s.stat.name}: {s.base_stat}
               </Text>
             ))}
-          </View>
+          </Animated.View>
         </>
       )}
     </View>
