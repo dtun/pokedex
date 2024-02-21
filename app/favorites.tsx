@@ -18,7 +18,7 @@ import Animated, {
 import { FlashList } from '@shopify/flash-list';
 
 const Page = () => {
-  const [keys] = useState(storage.getAllKeys());
+  const [keys, setKeys] = useState(storage.getAllKeys());
   const [data, setData] = useState<Pokemon[]>();
   const pokemonQueries = useQueries({
     queries: keys.map((k) => {
@@ -33,6 +33,7 @@ const Page = () => {
   const deleteFavorite = async (id: number) => {
     storage.delete(`favorite-${id}`);
     setData((prev) => prev?.filter((p) => p.id !== id));
+    setKeys((prev) => prev.filter((k) => k !== `favorite-${id}`));
   };
 
   useEffect(() => {
@@ -45,7 +46,11 @@ const Page = () => {
         ListEmptyComponent={
           pokemonQueries.some((q) => q.isLoading) ? (
             <ActivityIndicator style={{ marginTop: 30 }} />
-          ) : null
+          ) : (
+            <Text style={{ textAlign: 'center', marginTop: 30 }}>
+              No favorites
+            </Text>
+          )
         }
         keyExtractor={(p) => p.id.toString()}
         data={data}
