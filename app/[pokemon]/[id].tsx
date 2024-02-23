@@ -16,11 +16,14 @@ const Page = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(
     storage.getString(`favorite-${id}`) === 'true'
   );
-
   const pokemonQuery = useQuery({
     queryKey: ['pokemon', id],
     queryFn: () => getPokemonDetail(id!),
   });
+  const toggleFavorite = async () => {
+    storage.set(`favorite-${id}`, isFavorite ? 'false' : 'true');
+    setIsFavorite(!isFavorite);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -49,22 +52,14 @@ const Page = () => {
     });
   }, [isFavorite]);
 
-  const toggleFavorite = async () => {
-    storage.set(`favorite-${id}`, isFavorite ? 'false' : 'true');
-    setIsFavorite(!isFavorite);
-  };
-
   return (
-    <View style={{ padding: 10 }}>
+    <View style={styles.wrapper}>
       {pokemonQuery.isLoading && (
-        <ActivityIndicator style={{ marginTop: 30 }} />
+        <ActivityIndicator style={styles.activityIndicator} />
       )}
       {pokemonQuery.data && (
         <>
-          <Animated.View
-            entering={FadeIn.delay(200)}
-            style={[styles.card, { alignItems: 'center' }]}
-          >
+          <Animated.View entering={FadeIn.delay(200)} style={styles.card}>
             <Image
               source={{ uri: pokemonQuery.data.sprites.front_default }}
               style={styles.cardImage}
@@ -77,7 +72,7 @@ const Page = () => {
             </Animated.Text>
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(500)} style={styles.card}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Stats:</Text>
+            <Text style={styles.stats}>Stats:</Text>
             {pokemonQuery.data.stats.map((s: any) => (
               <Text key={s.stat.name}>
                 {s.stat.name}: {s.base_stat}
@@ -93,6 +88,9 @@ const Page = () => {
 export default Page;
 
 const styles = StyleSheet.create({
+  wrapper: { padding: 10 },
+  activityIndicator: { marginTop: 30 },
+  stats: { fontSize: 16, fontWeight: 'bold' },
   card: {
     backgroundColor: '#fff',
     padding: 10,
@@ -103,6 +101,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
     shadowOffset: { width: 0, height: 1 },
+    alignItems: 'center',
   },
   cardImage: { width: 200, height: 200 },
   name: {

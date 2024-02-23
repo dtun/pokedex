@@ -41,15 +41,13 @@ const Page = () => {
   }, [allFinished]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.flex1}>
       <FlashList
         ListEmptyComponent={
           pokemonQueries.some((q) => q.isLoading) ? (
-            <ActivityIndicator style={{ marginTop: 30 }} />
+            <ActivityIndicator style={styles.activityIndicator} />
           ) : (
-            <Text style={{ textAlign: 'center', marginTop: 30 }}>
-              No favorites
-            </Text>
+            <Text style={styles.noFavorites}>No favorites</Text>
           )
         }
         keyExtractor={(p) => p.id.toString()}
@@ -82,6 +80,9 @@ const Page = () => {
 export default Page;
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
+  activityIndicator: { marginTop: 30 },
+  noFavorites: { textAlign: 'center', marginTop: 30 },
   item: {
     padding: 10,
     flexDirection: 'row',

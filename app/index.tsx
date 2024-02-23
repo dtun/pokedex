@@ -13,7 +13,6 @@ import { FlashList, ListRenderItem } from '@shopify/flash-list';
 
 const Page = () => {
   const pokemonQuery = useQuery({ queryKey: ['pokemon'], queryFn: getPokemon });
-
   const renderItem: ListRenderItem<Pokemon> = ({ item: p }) => (
     <Link href={`/[pokemon]/${p.id}`} asChild>
       <TouchableWithoutFeedback>
@@ -27,18 +26,16 @@ const Page = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.flex1}>
       {pokemonQuery.isLoading && (
-        <ActivityIndicator style={{ marginTop: 30 }} />
+        <ActivityIndicator style={styles.activityIndicator} />
       )}
       <FlashList
         data={pokemonQuery.data}
         renderItem={renderItem}
         estimatedItemSize={100}
         ItemSeparatorComponent={() => (
-          <View
-            style={{ height: 1, width: '100%', backgroundColor: '#dfdfdf' }}
-          />
+          <View style={styles.itemSeparatorComponent} />
         )}
       />
     </View>
@@ -48,6 +45,8 @@ const Page = () => {
 export default Page;
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
+  activityIndicator: { marginTop: 30 },
   item: {
     padding: 10,
     flexDirection: 'row',
@@ -64,5 +63,10 @@ const styles = StyleSheet.create({
   preview: {
     width: 100,
     height: 100,
+  },
+  itemSeparatorComponent: {
+    height: 1,
+    width: '100%',
+    backgroundColor: '#dfdfdf',
   },
 });

@@ -1,5 +1,5 @@
 import { Link, Stack } from 'expo-router';
-import { Text, TouchableWithoutFeedback } from 'react-native';
+import { Text, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const client = new QueryClient();
@@ -9,7 +9,7 @@ const Layout = () => {
     <QueryClientProvider client={client}>
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#f4511e' },
+          headerStyle: styles.headerStyle,
           headerTintColor: '#fff',
         }}
       >
@@ -20,11 +20,7 @@ const Layout = () => {
             headerRight: () => (
               <Link href="/favorites" asChild>
                 <TouchableWithoutFeedback>
-                  <Text
-                    style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}
-                  >
-                    ♥
-                  </Text>
+                  <Text style={styles.headerRight}>♥</Text>
                 </TouchableWithoutFeedback>
               </Link>
             ),
@@ -41,3 +37,8 @@ const Layout = () => {
 };
 
 export default Layout;
+
+const styles = StyleSheet.create({
+  headerStyle: { backgroundColor: '#f4511e' },
+  headerRight: { fontSize: 22, fontWeight: 'bold', color: '#fff' },
+});
